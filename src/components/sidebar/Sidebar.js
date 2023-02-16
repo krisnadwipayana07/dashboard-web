@@ -7,11 +7,11 @@ export default function Sidebar() {
   return (
     <Box>
       {sidebarLink.map((item, key) => (
-        <Box key={key} py="10">
-          <Link href={item.url}>
+        <Link key={key} href={item.url}>
+          <Box py="10" border="1px " borderBottomColor="#6913D8">
             <Text>{item.name}</Text>
-          </Link>
-        </Box>
+          </Box>
+        </Link>
       ))}
     </Box>
   );

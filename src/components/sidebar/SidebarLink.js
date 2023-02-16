@@ -1,4 +1,4 @@
 export const sidebarLink = [
-  { name: "Products", url: "/products" },
-  { name: "Carts", url: "/carts" },
+  { name: "Products", url: "/admin/products" },
+  { name: "Carts", url: "/admin/carts" },
 ];
