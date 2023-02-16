@@ -1,3 +1,5 @@
+import BarChart from "@/components/charts/bar/BarChart";
+import SearchForm from "@/components/form/searchform/SearchForm";
 import BaseLayout from "@/components/layout/BaseLayout";
 import Pagination from "@/components/pagination/Pagination";
 import {
@@ -39,30 +41,24 @@ export default function Products() {
       })
       .catch((err) => console.log(err))
       .finally(() => setIsLoading(false));
-  }, [page, keyword]);
+  }, [page, search]);
 
   const handlePrevPage = () => setPage(page - 1);
   const handleNextPage = () => setPage(page + 1);
   const handleChangeSearch = (e) => setKeyword(e.target.value);
   const handleSearchClick = (e) => {
     e.preventDefault();
+    setSearch(search + 1);
   };
 
   return (
     <Box>
-      <form>
-        <Box display="flex" justifyContent="end" py="5">
-          <Input
-            w="30%"
-            placeholder="Search"
-            name="search"
-            onChange={handleChangeSearch}
-          />
-          <Button ml="1" type="submit" onClick={handleSearchClick}>
-            Search
-          </Button>
-        </Box>
-      </form>
+      <SearchForm
+        handleChangeSearch={handleChangeSearch}
+        handleSearchClick={handleSearchClick}
+        value={keyword}
+      />
+      {/* <BarChart data={dataProduct}></BarChart> */}
       <TableContainer px="5">
         <Skeleton isLoaded={!isLoading}>
           <Table variant="simple">
@@ -76,11 +72,15 @@ export default function Products() {
             </TableCaption>
             <Thead>
               <Tr>
-                <Th>Product Name</Th>
-                <Th>Brand</Th>
-                <Th isNumeric>Price</Th>
-                <Th isNumeric>Stock</Th>
-                <Th>Category</Th>
+                <Th color="purple.700">Product Name</Th>
+                <Th color="purple.700">Brand</Th>
+                <Th color="purple.700" isNumeric>
+                  Price
+                </Th>
+                <Th color="purple.700" isNumeric>
+                  Stock
+                </Th>
+                <Th color="purple.700">Category</Th>
               </Tr>
             </Thead>
 

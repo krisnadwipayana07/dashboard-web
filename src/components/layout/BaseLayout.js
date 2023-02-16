@@ -1,26 +1,35 @@
 import { HamburgerIcon } from "@chakra-ui/icons";
-import { Box, IconButton, MenuIcon, Text } from "@chakra-ui/react";
-import Link from "next/link";
-import React from "react";
+import { Box, IconButton } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import Sidebar from "../sidebar/Sidebar";
 
 export default function BaseLayout({ children }) {
-  const sidebarWidth = 15;
+  const [isOpen, setIsOpen] = useState(true);
+
   return (
     <Box display="flex">
       <Box
-        w={sidebarWidth + "vw"}
-        bgColor="whitesmoke"
-        py="20"
-        px="5"
+        hidden={!isOpen}
+        w="14em"
         boxShadow="dark-lg"
+        borderRight="2px solid #E1EEDD"
       >
         <Sidebar />
       </Box>
-      <Box minH="100vh" w={100 - sidebarWidth + "vw"}>
-        <Box h="5vh" bgColor="whitesmoke" boxShadow="dark-lg">
-          <IconButton>
-            <HamburgerIcon />
+      <Box minH="100vh" w={100 + "vw"}>
+        <Box
+          h="7vh"
+          bgColor="whitesmoke"
+          p="5"
+          borderBottom="2px solid #E1EEDD"
+        >
+          <IconButton
+            p="10"
+            size="lg"
+            colorScheme="purple"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            <HamburgerIcon color="#553C9A" />
           </IconButton>
         </Box>
         {children}

@@ -1,9 +1,28 @@
 import "@/styles/globals.css";
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import {
+  ChakraBaseProvider,
+  ChakraProvider,
+  extendTheme,
+} from "@chakra-ui/react";
 import Head from "next/head";
 
 export default function App({ Component, pageProps }) {
-  const theme = extendTheme();
+  const colors = {
+    purple: {
+      50: "#F1E8FD",
+      100: "#D8BDF9",
+      200: "#BE93F6",
+      300: "#A569F2",
+      400: "#8B3FEE",
+      500: "#7215EA",
+      600: "#5B10BC",
+      700: "#440C8D",
+      800: "#2E085E",
+      900: "#17042F",
+    },
+  };
+
+  const theme = extendTheme({ colors });
 
   const getLayout = Component.getLayout || ((page) => page);
   return getLayout(
@@ -14,9 +33,9 @@ export default function App({ Component, pageProps }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <ChakraProvider theme={theme}>
+      <ChakraBaseProvider theme={theme}>
         <Component {...pageProps} />
-      </ChakraProvider>
+      </ChakraBaseProvider>
     </>
   );
 }
