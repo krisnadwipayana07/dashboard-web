@@ -1,6 +1,5 @@
 import React from "react";
 import { Bar } from "react-chartjs-2";
-import "../ChartRegister";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,7 +21,6 @@ ChartJS.register(
 
 export default function BarChart({ data }) {
   const options = {
-    responsive: true,
     plugins: {
       legend: {
         position: "top",
