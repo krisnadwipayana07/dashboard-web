@@ -5,7 +5,16 @@ import Pagination from "@/components/pagination/Pagination";
 import {
   Box,
   Button,
+  IconButton,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Select,
+  SimpleGrid,
   Skeleton,
   Table,
   TableCaption,
@@ -19,7 +28,11 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { GetAllProduct } from "../api/productApi";
+import {
+  GetAllCategories,
+  GetAllProduct,
+  GetSelectProduct,
+} from "../api/productApi";
 
 export default function Products() {
   const limit = 5;
@@ -30,7 +43,31 @@ export default function Products() {
   const [isLoading, setIsLoading] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [search, setSearch] = useState(1);
+  const [graphData, setGraphData] = useState({});
+  const [openChart, setOpenChart] = useState(false);
+  const [allCategories, setAllCategories] = useState([]);
+  const [category, setCategory] = useState("");
 
+  const labels = Object.keys(graphData);
+
+  const DataBrand = {
+    labels,
+    datasets: [
+      {
+        label: "Total Product",
+        data: Object.values(graphData),
+        backgroundColor: "#553C9A",
+      },
+    ],
+  };
+
+  useEffect(() => {
+    const savedSearch = localStorage.getItem("searchQuery");
+    if (savedSearch) {
+      setKeyword(savedSearch);
+      setSearch(search + 1);
+    }
+  }, []);
   useEffect(() => {
     let skip = limit * (page - 1);
     setIsLoading(true);
@@ -42,6 +79,21 @@ export default function Products() {
       .catch((err) => console.log(err))
       .finally(() => setIsLoading(false));
   }, [page, search]);
+  useEffect(() => {
+    const select = "brand";
+    const limit = 100;
+    const temp = {};
+    GetSelectProduct({ select, limit }).then((res) => {
+      res.data.products?.forEach((item) => {
+        if (temp[item.brand] === undefined) {
+          temp[item.brand] = 1;
+        } else {
+          temp[item.brand] = temp[item.brand] + 1;
+        }
+      });
+    });
+    setGraphData(temp);
+  }, []);
 
   const handlePrevPage = () => setPage(page - 1);
   const handleNextPage = () => setPage(page + 1);
@@ -49,17 +101,31 @@ export default function Products() {
   const handleSearchClick = (e) => {
     e.preventDefault();
     setSearch(search + 1);
+    setPage(1);
+    localStorage.setItem("searchQuery", keyword);
+  };
+  const handleCloseChart = () => {
+    setOpenChart(false);
+  };
+  const HandleChangeCategory = (e) => {
+    setCategory(e.target.value);
+    console.log(category);
   };
 
   return (
-    <Box>
-      <SearchForm
-        handleChangeSearch={handleChangeSearch}
-        handleSearchClick={handleSearchClick}
-        value={keyword}
-      />
-      {/* <BarChart data={dataProduct}></BarChart> */}
-      <TableContainer px="5">
+    <Box p="5">
+      <SimpleGrid columns={[1, 2]}>
+        <Box>
+          <Button onClick={() => setOpenChart(true)}>Show Graph</Button>
+        </Box>
+        <SearchForm
+          handleChangeSearch={handleChangeSearch}
+          handleSearchClick={handleSearchClick}
+          value={keyword}
+        />
+      </SimpleGrid>
+
+      <TableContainer pt="3">
         <Skeleton isLoaded={!isLoading}>
           <Table variant="simple">
             <TableCaption>
@@ -98,6 +164,16 @@ export default function Products() {
           </Table>
         </Skeleton>
       </TableContainer>
+      <Modal size="4xl" isOpen={openChart} onClose={handleCloseChart}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Chart Brand</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <BarChart data={DataBrand}></BarChart>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }

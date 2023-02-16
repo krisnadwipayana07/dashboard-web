@@ -8,9 +8,8 @@ export default function SearchForm({
 }) {
   return (
     <form>
-      <Box display="flex" justifyContent="end" py="5">
+      <Box display="flex">
         <Input
-          w="30%"
           placeholder="Search"
           name="search"
           value={value}
