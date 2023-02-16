@@ -83,11 +83,11 @@ export default function Carts() {
             </TableCaption>
             <Thead>
               <Tr>
-                <Th>Total Products</Th>
-                <Th>Total Qty</Th>
-                <Th>Total Price</Th>
-                <Th>Total Discount</Th>
-                <Th>Actions</Th>
+                <Th color="purple.700">Total Products</Th>
+                <Th color="purple.700">Total Qty</Th>
+                <Th color="purple.700">Total Price</Th>
+                <Th color="purple.700">Total Discount</Th>
+                <Th color="purple.700">Actions</Th>
               </Tr>
             </Thead>
             <Tbody>
