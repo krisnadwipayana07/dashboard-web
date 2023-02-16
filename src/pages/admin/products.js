@@ -17,10 +17,10 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { GetAllProduct } from "./api/productApi";
+import { GetAllProduct } from "../api/productApi";
 
 export default function Products() {
-  const limit = 10;
+  const limit = 5;
 
   const [page, setPage] = useState(1);
   const [totalData, setTotalData] = useState(1);
@@ -63,38 +63,40 @@ export default function Products() {
           </Button>
         </Box>
       </form>
-      <TableContainer>
-        <Table variant="simple">
-          <TableCaption>
-            <Pagination
-              page={page}
-              handleNextPage={handleNextPage}
-              handlePrevPage={handlePrevPage}
-              disableNext={limit * page >= totalData}
-            />
-          </TableCaption>
-          <Thead>
-            <Tr>
-              <Th>Product Name</Th>
-              <Th>Brand</Th>
-              <Th isNumeric>Price</Th>
-              <Th isNumeric>Stock</Th>
-              <Th>Category</Th>
-            </Tr>
-          </Thead>
-
-          <Tbody>
-            {dataProduct?.map((item, key) => (
-              <Tr key={key}>
-                <Td>{item.title}</Td>
-                <Td>{item.brand}</Td>
-                <Td isNumeric>{item.price}</Td>
-                <Td isNumeric>{item.stock}</Td>
-                <Td>{item.category}</Td>
+      <TableContainer px="5">
+        <Skeleton isLoaded={!isLoading}>
+          <Table variant="simple">
+            <TableCaption>
+              <Pagination
+                page={page}
+                handleNextPage={handleNextPage}
+                handlePrevPage={handlePrevPage}
+                disableNext={limit * page >= totalData}
+              />
+            </TableCaption>
+            <Thead>
+              <Tr>
+                <Th>Product Name</Th>
+                <Th>Brand</Th>
+                <Th isNumeric>Price</Th>
+                <Th isNumeric>Stock</Th>
+                <Th>Category</Th>
               </Tr>
-            ))}
-          </Tbody>
-        </Table>
+            </Thead>
+
+            <Tbody>
+              {dataProduct?.map((item, key) => (
+                <Tr key={key}>
+                  <Td>{item.title}</Td>
+                  <Td>{item.brand}</Td>
+                  <Td isNumeric>{item.price}</Td>
+                  <Td isNumeric>{item.stock}</Td>
+                  <Td>{item.category}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Skeleton>
       </TableContainer>
     </Box>
   );
