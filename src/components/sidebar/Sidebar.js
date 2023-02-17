@@ -1,4 +1,4 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
@@ -25,12 +25,12 @@ export default function Sidebar() {
               bgColor={pathname === item.url ? "#6913D8" : ""}
               borderEndRadius="30px"
             >
-              <Text
+              <Button
                 display="flex"
                 color={pathname === item.url ? "white" : "black"}
               >
                 {item.name}
-              </Text>
+              </Button>
             </Box>
           </Link>
         ))}

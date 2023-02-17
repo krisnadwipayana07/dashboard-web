@@ -27,22 +27,28 @@ export default function Carts() {
   const limit = 5;
 
   const [page, setPage] = useState(1);
+  const [pageFetched, setPageFetched] = useState(0);
   const [totalData, setTotalData] = useState(1);
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [search, setSearch] = useState(1);
 
+  let skip = limit * (page - 1);
+
   useEffect(() => {
-    let skip = limit * (page - 1);
-    setIsLoading(true);
-    GetAllCart({ limit, skip })
-      .then((res) => {
-        setData(res.data.carts);
-        setTotalData(res.data.total);
-      })
-      .catch((err) => console.log(err))
-      .finally(() => setIsLoading(false));
+    if (pageFetched < page) {
+      setPageFetched(page);
+      setIsLoading(true);
+      GetAllCart({ limit, skip })
+        .then((res) => {
+          const { carts } = res.data;
+          setData([...data, ...carts]);
+          setTotalData(res.data.total);
+        })
+        .catch((err) => console.log(err))
+        .finally(() => setIsLoading(false));
+    }
   }, [page]);
 
   const handlePrevPage = () => setPage(page - 1);
@@ -56,20 +62,7 @@ export default function Carts() {
   };
 
   return (
-    <Box p="5">
-      <form>
-        <Box display="flex" justifyContent="end" py="5">
-          <Input
-            w="30%"
-            placeholder="Search"
-            name="search"
-            onChange={handleChangeSearch}
-          />
-          <Button ml="1" type="submit" onClick={handleSearchClick}>
-            Search
-          </Button>
-        </Box>
-      </form>
+    <Box p="5" pt="10">
       <TableContainer>
         <Skeleton isLoaded={!isLoading}>
           <Table variant="simple">
@@ -91,7 +84,7 @@ export default function Carts() {
               </Tr>
             </Thead>
             <Tbody>
-              {data?.map((item, key) => (
+              {data?.slice(skip, limit * page).map((item, key) => (
                 <Tr key={key}>
                   <Td>{item.totalProducts}</Td>
                   <Td>{item.totalQuantity}</Td>

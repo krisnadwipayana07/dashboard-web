@@ -1,4 +1,5 @@
-import "@/styles/globals.css";
+import GeneralContextProvider from "@/contexts/GeneralContext";
+// import "@/styles/globals.css";
 import {
   ChakraBaseProvider,
   ChakraProvider,
@@ -33,9 +34,11 @@ export default function App({ Component, pageProps }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <ChakraBaseProvider theme={theme}>
-        <Component {...pageProps} />
-      </ChakraBaseProvider>
+      <GeneralContextProvider>
+        <ChakraProvider theme={theme}>
+          <Component {...pageProps} />
+        </ChakraProvider>
+      </GeneralContextProvider>
     </>
   );
 }

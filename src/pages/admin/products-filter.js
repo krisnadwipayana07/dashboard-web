@@ -2,11 +2,10 @@ import BarChart from "@/components/charts/bar/BarChart";
 import SearchForm from "@/components/form/searchform/SearchForm";
 import BaseLayout from "@/components/layout/BaseLayout";
 import Pagination from "@/components/pagination/Pagination";
+import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
-  IconButton,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -21,22 +20,17 @@ import {
   TableContainer,
   Tbody,
   Td,
-  Text,
-  Tfoot,
   Th,
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
-import {
-  GetAllCategories,
-  GetAllProduct,
-  GetSelectProduct,
-} from "../api/productApi";
+import { useEffect, useState } from "react";
+import { GetAllProduct, GetSelectProduct } from "../api/productApi";
 
-export default function Products() {
+export default function ProductsFilter() {
+  const limit = 5;
+
   const [page, setPage] = useState(1);
-  const [pageFetched, setPageFetched] = useState(0);
   const [totalData, setTotalData] = useState(1);
   const [dataProduct, setDataProduct] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,11 +38,11 @@ export default function Products() {
   const [search, setSearch] = useState(1);
   const [graphData, setGraphData] = useState({});
   const [openChart, setOpenChart] = useState(false);
-  const [allCategories, setAllCategories] = useState([]);
-  const [category, setCategory] = useState("");
+  const [clicked, setClicked] = useState(0);
+  const [sortType, setSortType] = useState("");
 
-  const limit = 5;
-  let skip = limit * (page - 1);
+  const [filterActive, setFilterActive] = useState("");
+
   const labels = Object.keys(graphData);
 
   const DataBrand = {
@@ -61,6 +55,13 @@ export default function Products() {
       },
     ],
   };
+  const headerTable = [
+    { name: "Product Name", value: "title" },
+    { name: "Brand", value: "brand" },
+    { name: "Price", value: "price", isNumber: true },
+    { name: "Stock", value: "stock", isNumber: true },
+    { name: "Category", value: "category" },
+  ];
 
   useEffect(() => {
     const savedSearch = localStorage.getItem("searchQuery");
@@ -69,20 +70,20 @@ export default function Products() {
       setSearch(search + 1);
     }
   }, []);
+
   useEffect(() => {
-    if (pageFetched < page) {
-      setIsLoading(true);
-      setPageFetched(page);
-      GetAllProduct({ keyword, limit, skip })
-        .then((res) => {
-          const { products } = res.data;
-          setDataProduct([...dataProduct, ...products]);
-          setTotalData(res.data.total);
-        })
-        .catch((err) => console.log(err))
-        .finally(() => setIsLoading(false));
-    }
-  }, [page, search]);
+    setIsLoading(true);
+    let skip = 0;
+    const limit = 100;
+    GetAllProduct({ keyword, limit, skip })
+      .then((res) => {
+        setDataProduct(res.data.products);
+        setTotalData(res.data.total);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
+  }, []);
+
   useEffect(() => {
     const select = "brand";
     const limit = 100;
@@ -111,11 +112,48 @@ export default function Products() {
   const handleCloseChart = () => {
     setOpenChart(false);
   };
-  const HandleChangeCategory = (e) => {
-    setCategory(e.target.value);
-    console.log(category);
+  const HandleChangeFilter = (value) => {
+    if (filterActive === value) {
+      setClicked(clicked + 1);
+      if (clicked % 2 === 0) {
+        setSortType("asc");
+      } else {
+        setSortType("desc");
+      }
+    } else {
+      setFilterActive(value);
+      setClicked(1);
+      setSortType("asc");
+    }
   };
 
+  function filteringData(a, b) {
+    if (typeof a[filterActive] === "number") {
+      if (sortType === "asc") {
+        return a[filterActive] - b[filterActive];
+      } else {
+        return b[filterActive] - a[filterActive];
+      }
+    } else {
+      var textA = a[filterActive]?.toLowerCase(),
+        textB = b[filterActive]?.toLowerCase();
+      if (sortType === "asc") {
+        if (textA < textB) {
+          return -1;
+        }
+        if (textA > textB) {
+          return 1;
+        }
+      } else {
+        if (textA > textB) {
+          return -1;
+        }
+        if (textA < textB) {
+          return 1;
+        }
+      }
+    }
+  }
   return (
     <Box p="5">
       <SimpleGrid columns={[1, 2]}>
@@ -142,28 +180,41 @@ export default function Products() {
             </TableCaption>
             <Thead>
               <Tr>
-                <Th color="purple.700">Product Name</Th>
-                <Th color="purple.700">Brand</Th>
-                <Th color="purple.700" isNumeric>
-                  Price
-                </Th>
-                <Th color="purple.700" isNumeric>
-                  Stock
-                </Th>
-                <Th color="purple.700">Category</Th>
+                {headerTable.map((item, key) => (
+                  <Th color="purple.700" key={key} isNumeric={item.isNumber}>
+                    <Button
+                      variant="ghost"
+                      onClick={() => HandleChangeFilter(item.value)}
+                    >
+                      {item.name}
+                      {item.value === filterActive ? (
+                        sortType === "asc" ? (
+                          <ArrowUpIcon />
+                        ) : (
+                          <ArrowDownIcon />
+                        )
+                      ) : (
+                        <></>
+                      )}
+                    </Button>
+                  </Th>
+                ))}
               </Tr>
             </Thead>
 
             <Tbody>
-              {dataProduct?.slice(skip, limit * page).map((item, key) => (
-                <Tr key={key}>
-                  <Td>{item.title}</Td>
-                  <Td>{item.brand}</Td>
-                  <Td isNumeric>{item.price}</Td>
-                  <Td isNumeric>{item.stock}</Td>
-                  <Td>{item.category}</Td>
-                </Tr>
-              ))}
+              {dataProduct
+                ?.sort((a, b) => filteringData(a, b))
+                .slice(limit * (page - 1), limit * page)
+                .map((item, key) => (
+                  <Tr key={key}>
+                    <Td>{item.title}</Td>
+                    <Td>{item.brand}</Td>
+                    <Td isNumeric>{item.price}</Td>
+                    <Td isNumeric>{item.stock}</Td>
+                    <Td>{item.category}</Td>
+                  </Tr>
+                ))}
             </Tbody>
           </Table>
         </Skeleton>
@@ -182,4 +233,4 @@ export default function Products() {
   );
 }
 
-Products.getLayout = (page) => <BaseLayout>{page}</BaseLayout>;
+ProductsFilter.getLayout = (page) => <BaseLayout>{page}</BaseLayout>;
