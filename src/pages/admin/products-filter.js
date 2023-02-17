@@ -65,9 +65,13 @@ export default function ProductsFilter() {
 
   useEffect(() => {
     const savedSearch = localStorage.getItem("searchQuery");
+    const savedFilter = localStorage.getItem("filterQuery");
     if (savedSearch) {
       setKeyword(savedSearch);
-      setSearch(search + 1);
+    }
+    if (savedFilter) {
+      setFilterActive(savedFilter);
+      setClicked(1);
     }
   }, []);
 
@@ -82,7 +86,7 @@ export default function ProductsFilter() {
       })
       .catch((err) => console.log(err))
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [search]);
 
   useEffect(() => {
     const select = "brand";
@@ -121,6 +125,7 @@ export default function ProductsFilter() {
         setSortType("desc");
       }
     } else {
+      localStorage.setItem("filterQuery", value);
       setFilterActive(value);
       setClicked(1);
       setSortType("asc");
