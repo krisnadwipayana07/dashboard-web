@@ -158,7 +158,9 @@ export default function ProductsFilter() {
     <Box p="5">
       <SimpleGrid columns={[1, 2]}>
         <Box>
-          <Button onClick={() => setOpenChart(true)}>Show Graph</Button>
+          <Button colorScheme="purple" onClick={() => setOpenChart(true)}>
+            Show Graph
+          </Button>
         </Box>
         <SearchForm
           handleChangeSearch={handleChangeSearch}
