@@ -1,6 +1,6 @@
 const { default: axios } = require("axios");
 
-const dummyJson = "https://dummyjson.com/";
+const dummyJson = process.env.NEXT_PUBLIC_BASE_URL;
 
 const client = axios.create({
   baseURL: dummyJson,
